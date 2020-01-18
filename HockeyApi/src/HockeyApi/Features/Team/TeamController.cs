@@ -6,11 +6,11 @@ namespace HockeyApi.Features
 	[Route("team")]
 	public class TeamController : Controller {
 		private readonly ITeamService _teamService;
-		private readonly ITeamDetailsService _teamPlayerService;
+		private readonly ITeamDetailsService _teamDetailsService;
 
-		public TeamController(ITeamService teamService, ITeamDetailsService teamPlayerService) {
+		public TeamController(ITeamService teamService, ITeamDetailsService teamDetailsService) {
 			_teamService = teamService;
-			_teamPlayerService = teamPlayerService;
+			_teamDetailsService = teamDetailsService;
 		}
 
 		[HttpGet]
@@ -20,6 +20,6 @@ namespace HockeyApi.Features
 		[HttpGet]
 		[Route("{teamCode}")]
 		public IActionResult GetTeam(string teamCode) =>
-			Json(_teamPlayerService.List(teamCode));
+			Json(_teamDetailsService.List(teamCode));
 	}
 }
