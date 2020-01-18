@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>NHLPA JavaScript Assessment</title>
+	<style>
+		html { box-sizing: border-box; }
+		*, *::before, *::after { box-sizing: inherit; }
+		.stage { max-width: 40rem; margin-left: auto; margin-right: auto; }
+		code { background-color: #eee; }
+	</style>
+</head>
+<body>
+	<main class="stage">
+		<h1>JavaScript Assessment</h1>
+		<p class="instructions">Within the script tag immediately preceding the <code>&lt;/body&gt;</code> Complete the following steps without the aid of jQuery or any other external libraries. Modifying the markup directly is not permitted.</p>
+			<ol>
+				<li>Set the global global font family to: <code>font-family: sans-serif</code></li>
+				<li>Hide (i.e. <code>display: none</code>) any element(s) with the class: <code>.instructions</code></li>
+				<li>Execute AJAX request <code>GET https://jsonplaceholder.typicode.com/photos/1</code>. On success, append <code>&lt;img src="..." /&gt;</code> to body using the <code>thumbnailUrl</code> property returned in the JSON request.</li>
+				<li>Execute AJAX request <code>GET https://jsonplaceholder.typicode.com/posts?userId=1</code>. On success, for each item returned, append <code>&lt;a href="https://jsonplaceholder.typicode.com/posts/{id}"&gt;{title}&lt;a/&gt;</code> to body.</li>
+			</ol>		
+	</main>
+	<script type="text/javascript">
+		(function(){
+			let head = document.head || document.getElementsByTagName("head")[0];
+			let body = document.querySelector("body");
+			let stage = document.querySelectorAll(".stage")[0];
+			let cssRules = ".display-none { display: none; } .sans-serif { font-family: sans-serif; }";
+			let instructions = document.querySelectorAll(".instructions");
+
+			let addStyleElement = function(cssRules = ""){
+				if (!document.querySelector("style")){
+					let style = document.createElement("style");
+					style.type = "text/css";
+					style.innerHTML = cssRules;
+					head.appendChild(style);
+				} else {
+					let style = document.querySelector("style");
+					style.innerHTML += ` ${ cssRules }`;
+				}
+			}
+
+			let hasClass = function(element, className){
+				return (" " + element.className + " ").indexOf(" " + className + " ") > -1;
+			}
+
+			let addClass = function(element, className) {
+				if (element.classList)
+					element.classList.add(className)
+				else if (!hasClass(element, className))
+					element.className += " " + className;
+			};
+
+			let loadImage = function (callback) {
+    			let xhr = new XMLHttpRequest();
+				xhr.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						let img = document.createElement("img");
+						img.src = JSON.parse(this.responseText).thumbnailUrl;
+						stage.appendChild(img);
+						callback();
+					}
+					else if (xhr.status == 400) {
+						console.log("There was an error - 400");
+					}
+					else {
+						console.log("Something other than 200 was returned");
+					}
+				};
+				xhr.open("GET", "https://jsonplaceholder.typicode.com/photos/1", true);
+				xhr.send();
+			}
+
+			let loadLinks = function() {
+				let xhr = new XMLHttpRequest();
+				xhr.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						let result = JSON.parse(this.responseText);
+						let length = result.length;
+						for (var i = 0; i < length; i++){
+							let obj = result[i];
+							let a = document.createElement("a");
+							a.href = `https://jsonplaceholder.typicode.com/posts/${ obj.id }`;
+							a.innerHTML = obj.title;
+							stage.appendChild(a);
+						}
+					}
+					else if (this.status == 400) {
+						console.log("There was an error - 400");
+					}
+					else {
+						console.log("Something other than 200 was returned");
+					}
+				};
+
+				xhr.open("GET", "https://jsonplaceholder.typicode.com/posts?userId=1", true);
+				xhr.send();
+			}
+
+			loadImage(loadLinks);
+			addStyleElement(cssRules);
+			addClass(body, "sans-serif");
+
+			for (var i = 0; i < instructions.length; i++){
+				addClass(instructions[i], "display-none");
+			}
+		})();
+	</script>
+</body>
+
+</html>
